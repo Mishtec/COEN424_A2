@@ -2,19 +2,6 @@ import json
 from db_init import initialize_database, initialize_redis
 
 
-def parse_redis_string(redis_string):
-
-    parsed_results = []
-    for result in redis_string:
-        movie_info = {
-            "title": result.get("title", ""),
-            "year": result.get("year", ""),
-            "comments_count": result.get("num_mflix_comments", '')
-        }
-        parsed_results.append(movie_info)
-    return parsed_results
-
-
 class MovieQueryFacade:
     def __init__(self):
         # Initialize MongoDB connection
@@ -37,7 +24,8 @@ class MovieQueryFacade:
             pipeline = [
                 {"$match": {"year": {"$gte": from_year, "$lte": to_year}}},
                 {"$sort": {"comments": -1}},
-                {"$limit": top_n}
+                {"$limit": top_n},
+                {"$project": {"tittle": "$tittle", "year": "$year", "num_comments": "$num_mflix_comments"}}
             ]
 
             results = list(self.db.movies.aggregate(pipeline))
@@ -49,8 +37,6 @@ class MovieQueryFacade:
                 # Convert ObjectId to string for JSON serialization
                 for result in results:
                     result["_id"] = str(result["_id"])
-
-                results = parse_redis_string(results)
 
                 # Insert results into Redis for future retrieval in JSON format
                 self.redis_client.set(redis_key, json.dumps(results, default=str))
