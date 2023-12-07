@@ -23,9 +23,9 @@ class MovieQueryFacade:
             # If results do not exist in Redis, query MongoDB
             pipeline = [
                 {"$match": {"year": {"$gte": from_year, "$lte": to_year}}},
-                {"$sort": {"comments": -1}},
+                {"$sort": {"num_mflix_comments": -1}},
                 {"$limit": top_n},
-                {"$project": {"tittle": "$tittle", "year": "$year", "num_comments": "$num_mflix_comments"}}
+                {"$project": {"_id": 0, "title": "$title", "year": "$year", "num_comments": "$num_mflix_comments"}}
             ]
 
             results = list(self.db.movies.aggregate(pipeline))
@@ -33,10 +33,6 @@ class MovieQueryFacade:
 
             if results:
                 print("Insert to Redis")
-
-                # Convert ObjectId to string for JSON serialization
-                for result in results:
-                    result["_id"] = str(result["_id"])
 
                 # Insert results into Redis for future retrieval in JSON format
                 self.redis_client.set(redis_key, json.dumps(results, default=str))
