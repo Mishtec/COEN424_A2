@@ -1,14 +1,10 @@
 import json
-from db_init import initialize_database, initialize_redis
 
 
 class MovieQueryFacade:
-    def __init__(self):
-        # Initialize MongoDB connection
-        self.db = initialize_database()
-
-        # Initialize Redis connection
-        self.redis_client = initialize_redis()
+    def __init__(self, db, redis_client):
+        self.db = db
+        self.redis_client = redis_client
 
     def query_top_n(self, top_n, from_year, to_year):
         # Check Redis for cached results
