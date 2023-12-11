@@ -15,8 +15,8 @@ class TestMovieQueryFacade(unittest.TestCase):
         self.mock_redis_client = MagicMock()
 
         # Replace the actual initialize_database and initialize_redis functions with mocks
-        with patch('your_module.initialize_database', return_value=self.mock_db):
-            with patch('your_module.initialize_redis', return_value=self.mock_redis_client):
+        with patch('movie_query_facade.initialize_database', return_value=self.mock_db):
+            with patch('movie_query_facade.initialize_redis', return_value=self.mock_redis_client):
                 # Create an instance of MovieQueryFacade for testing
                 self.movie_query_facade = MovieQueryFacade()
 
